@@ -370,6 +370,21 @@ func RegisterAuthAPIs(requireAuth bool, targetMux *http.ServeMux) {
 		authAgent.UnregisterUser(username)
 		authAgent.CreateUserAccount(username, newPassword, "")
 	})
+
+	// TOTP 2FA Endpoints
+	targetMux.HandleFunc("/api/auth/totp/status", authAgent.HandleTOTPStatus)
+	targetMux.HandleFunc("/api/auth/totp/generate", authAgent.HandleTOTPGenerate)
+	targetMux.HandleFunc("/api/auth/totp/verify", authAgent.HandleTOTPVerify)
+	targetMux.HandleFunc("/api/auth/totp/disable", authAgent.HandleTOTPDisable)
+	targetMux.HandleFunc("/api/auth/totp/verify-code", authAgent.HandleTOTPVerifyCode)
+
+	// WebAuthn (Passkey) Endpoints
+	targetMux.HandleFunc("/api/auth/webauthn/register/begin", authAgent.HandleWebAuthnRegisterBegin)
+	targetMux.HandleFunc("/api/auth/webauthn/register/complete", authAgent.HandleWebAuthnRegisterComplete)
+	targetMux.HandleFunc("/api/auth/webauthn/list", authAgent.HandleWebAuthnList)
+	targetMux.HandleFunc("/api/auth/webauthn/remove", authAgent.HandleWebAuthnRemove)
+	targetMux.HandleFunc("/api/auth/webauthn/auth/begin", authAgent.HandleWebAuthnAuthBegin)
+	targetMux.HandleFunc("/api/auth/webauthn/auth/complete", authAgent.HandleWebAuthnAuthComplete)
 }
 
 /* Register all the APIs */
