@@ -295,7 +295,7 @@ func NewAuthenticationAgent(sessionName string, key []byte, sysdb *db.Database, 
 		webauthnAuthWindowSeconds:   60,
 		webauthnAuthAttempts:        map[string]int{},
 		webauthnAuthIPLockouts:      map[string]time.Time{},
-		webauthnAuthLockoutDuration: 1 * time.Hour,
+		webauthnAuthLockoutDuration: 10 * time.Minute,
 	}
 
 	//Return the authAgent
