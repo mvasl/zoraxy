@@ -754,23 +754,28 @@
     }
 
     function startTOTPSetup() {
-        $.get("/api/auth/totp/generate", function(data) {
-            if (data.error) {
-                alert("Failed to generate TOTP setup: " + data.error);
-                return;
-            }
+        $.cjax({
+            type: "POST",
+            url: "/api/auth/totp/generate",
+            success: function(data) {
+                if (data.error) {
+                    alert("Failed to generate TOTP setup: " + data.error);
+                    return;
+                }
 
-            $("#totpQRArea").show();
-            $("#enable2FABtn").hide();
-            $("#totpQRCode").html('<img src="' + data.qrCode + '" style="max-width: 200px; height: auto;">');
-            $("#totpSecretKey").text(data.secret);
-            $("#totpSetupCode").val('').focus();
-            $("#totpSetupMsg").hide();
-            $("#totpSetupSuccess").hide();
-        }).fail(function(xhr) {
-            let msg = 'Failed to generate QR code.';
-            try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
-            alert(msg);
+                $("#totpQRArea").show();
+                $("#enable2FABtn").hide();
+                $("#totpQRCode").html('<img src="' + data.qrCode + '" style="max-width: 200px; height: auto;">');
+                $("#totpSecretKey").text(data.secret);
+                $("#totpSetupCode").val('').focus();
+                $("#totpSetupMsg").hide();
+                $("#totpSetupSuccess").hide();
+            },
+            error: function(xhr, status, error) {
+                let msg = 'Failed to generate QR code.';
+                try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
+                alert(msg);
+            }
         });
     }
 
