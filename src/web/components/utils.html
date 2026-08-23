@@ -934,26 +934,18 @@
                 const token = data.token;
                 const options = data.options.publicKey; // go-webauthn nests options under publicKey
 
-                // Convert options for WebAuthn API
-                const publicKey = {
-                    rp: {
-                        name: options.rp.name,
-                        id: options.rp.id,
-                    },
-                    user: {
-                        id: base64UrlToBufferWebauthn(options.user.id),
-                        name: options.user.name,
-                        displayName: options.user.displayName,
-                    },
-                    challenge: base64UrlToBufferWebauthn(options.challenge),
-                    pubKeyCredParams: options.pubKeyCredParams,
-                    timeout: options.timeout,
-                    attestation: options.attestation,
-                };
+                // Decode binary fields from base64url
+                options.challenge = base64urlToBuffer(options.challenge);
+                options.user.id   = base64urlToBuffer(options.user.id);
+                if (options.excludeCredentials) {
+                    options.excludeCredentials = options.excludeCredentials.map(c => ({
+                        ...c, id: base64urlToBuffer(c.id)
+                    }));
+                }
 
                 // Call WebAuthn registration API
                 navigator.credentials
-                    .create({ publicKey })
+                    .create({ publicKey: options })
                     .then(function(credential) {
                         // Step 2: Send credential to server
                         const credName = prompt("Enter a name for this passkey (e.g., 'iPhone 15', 'Windows Hello'):",
@@ -1024,19 +1016,11 @@
         });
     }
 
-    // Helper: Decode base64url to Uint8Array (for webauthn)
-    function base64UrlToBufferWebauthn(base64url) {
-        let base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
-        const pad = base64.length % 4;
-        if (pad) {
-            base64 += "=".repeat(4 - pad);
-        }
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-            bytes[i] = binary.charCodeAt(i);
-        }
-        return bytes;
+    // Helper: Decode base64url to ArrayBuffer (for webauthn)
+    function base64urlToBuffer(b64url) {
+        const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+        const bin = atob(b64);
+        return Uint8Array.from(bin, c => c.charCodeAt(0)).buffer;
     }
 
     // Helper: Convert WebAuthn credential to JSON-serializable format
