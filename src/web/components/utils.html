@@ -918,6 +918,16 @@
     function registerPasskey() {
         $("#passkeyRegMsg").hide();
         $("#passkeyRegSuccess").hide();
+
+        // Ask for passkey name before starting registration to avoid orphaned credentials
+        const credNameRaw = prompt("Enter a name for this passkey (e.g., 'iPhone 15', 'Windows Hello'):", "Passkey");
+        if (credNameRaw === null) {
+            // User cancelled the prompt
+            $("#passkeyRegMsg").text("Registration cancelled.").show();
+            return;
+        }
+        const credName = credNameRaw.trim() || "Passkey";
+
         $("#registerPasskeyBtn").prop("disabled", true).html('<i class="ui spinning loader icon"></i> Registering...');
 
         // Step 1: Get registration options
@@ -948,17 +958,9 @@
                     .create({ publicKey: options })
                     .then(function(credential) {
                         // Step 2: Send credential to server
-                        const credName = prompt("Enter a name for this passkey (e.g., 'iPhone 15', 'Windows Hello'):",
-                            "Passkey " + (data.credentialCount || 1));
-                        if (!credName) {
-                          $("#passkeyRegMsg").text("Registration declined.").show();
-                          $("#registerPasskeyBtn").prop("disabled", false).html('<i class="ui plus circle icon"></i> Register New Passkey');
-                          return
-                        }
-
                         $.cjax({
                             type: "POST",
-                            url: "/api/auth/webauthn/register/complete?token=" + token + "&name=" + encodeURIComponent(credName || ""),
+                            url: "/api/auth/webauthn/register/complete?token=" + token + "&name=" + encodeURIComponent(credName),
                             contentType: "application/json",
                             data: JSON.stringify(bufferToJSONCredential(credential)),
                             success: function(result) {
