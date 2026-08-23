@@ -1124,11 +1124,6 @@ func Hash(raw string) string {
 
 // HandleWebAuthnRegisterBegin starts the WebAuthn registration process for the logged-in user.
 func (a *AuthAgent) HandleWebAuthnRegisterBegin(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	username, err := a.GetUserName(w, r)
 	if err != nil {
 		utils.SendErrorResponse(w, "Login required")
@@ -1172,11 +1167,6 @@ func (a *AuthAgent) HandleWebAuthnRegisterBegin(w http.ResponseWriter, r *http.R
 
 // HandleWebAuthnRegisterComplete completes WebAuthn registration after the user's browser responds.
 func (a *AuthAgent) HandleWebAuthnRegisterComplete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	token := r.URL.Query().Get("token")
 	if token == "" {
 		utils.SendErrorResponse(w, "missing token parameter")
@@ -1359,11 +1349,6 @@ func (a *AuthAgent) HandleWebAuthnRegisterComplete(w http.ResponseWriter, r *htt
 
 // HandleWebAuthnList returns the list of registered WebAuthn passkeys for the logged-in user.
 func (a *AuthAgent) HandleWebAuthnList(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	username, err := a.GetUserName(w, r)
 	if err != nil {
 		utils.SendErrorResponse(w, "Login required")
@@ -1403,11 +1388,6 @@ func (a *AuthAgent) HandleWebAuthnList(w http.ResponseWriter, r *http.Request) {
 
 // HandleWebAuthnRemove removes a specific WebAuthn passkey credential.
 func (a *AuthAgent) HandleWebAuthnRemove(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	username, err := a.GetUserName(w, r)
 	if err != nil {
 		utils.SendErrorResponse(w, "Login required")
@@ -1459,11 +1439,6 @@ func (a *AuthAgent) HandleWebAuthnRemove(w http.ResponseWriter, r *http.Request)
 
 // HandleWebAuthnAuthBegin starts a discoverable-credential WebAuthn authentication flow.
 func (a *AuthAgent) HandleWebAuthnAuthBegin(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	// FIXME(mvasl):
 	// There is a potential issue here:
 	// If zoraxy sits behind another reverse proxy, the rate limiter might block all users at once
@@ -1604,11 +1579,6 @@ func buildAssertionRequest(id, rawId, clientDataJSON, authenticatorData, signatu
 
 // HandleWebAuthnAuthComplete completes WebAuthn authentication after the user's browser responds.
 func (a *AuthAgent) HandleWebAuthnAuthComplete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.SendErrorResponse(w, "method not allowed")
-		return
-	}
-
 	token := r.URL.Query().Get("token")
 	if token == "" {
 		utils.SendErrorResponse(w, "missing token parameter")
